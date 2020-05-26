@@ -37,6 +37,7 @@ def render(service, middleware):
     cf_contents = []
 
     afp = Struct(middleware.call_sync('datastore.query', 'services.afp', None, {'get': True}))
+    system_ready = middleare.call_sync('system.ready')
 
     cf_contents.append("[Global]\n")
     uam_list = ['uams_dhx.so', 'uams_dhx2.so']
@@ -132,7 +133,7 @@ def render(service, middleware):
     cf_contents.append("\n")
 
     for share in middleware.call_sync('datastore.query', 'sharing.afp_share', [['afp_enabled', '=', True]]):
-        if not os.path.exists(share['afp_path']):
+        if system_ready and not os.path.exists(share['afp_path']):
             middleware.logger.warning("Path [%s] to share [%s] does not exist",
                                       share["afp_path"], share["afp_name"])
             continue
